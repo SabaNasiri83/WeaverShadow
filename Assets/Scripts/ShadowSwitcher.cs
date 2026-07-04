@@ -21,7 +21,7 @@ public class ShadowSwitcher : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             controllingShadow = !controllingShadow;
 
