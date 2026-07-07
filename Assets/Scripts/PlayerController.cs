@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private bool isDucking;
 
+    [Header("Ladder")]
+    [Tooltip("وقتی true باشه، اسکریپت دیگه‌ای (مثل LadderClimb) کنترل حرکت رو دست گرفته - این اسکریپت هیچ حرکتی اعمال نمی‌کنه")]
+    public bool isClimbing = false;
+
     // نام دقیق پارامترهای Animator Controller (باید با AriaAnimatorSetup هماهنگ باشه)
     private static readonly int SpeedParam = Animator.StringToHash("Speed");
     private static readonly int GroundedParam = Animator.StringToHash("Grounded");
@@ -56,6 +60,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isClimbing) return; // موقع بالا رفتن از نردبون، این اسکریپت هیچ کنترلی اعمال نمی‌کنه
+
         moveInput = Input.GetAxisRaw("Horizontal");
 
         // خم شدن/نشستن: کلید پایین یا S، فقط وقتی روی زمینیم
@@ -77,6 +83,8 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isClimbing) return; // Rigidbody رو LadderClimb مستقیم کنترل می‌کنه
+
         float speedMultiplier = isDucking ? duckSpeedMultiplier : 1f;
         rb.velocity = new Vector2(moveInput * moveSpeed * speedMultiplier, rb.velocity.y);
     }
