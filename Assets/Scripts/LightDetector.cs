@@ -15,7 +15,7 @@ public class LightDetector : MonoBehaviour
             CheckpointManager checkpointManager = FindObjectOfType<CheckpointManager>();
             if (checkpointManager != null)
             {
-                checkpointManager.RespawnAtCheckpoint();
+                checkpointManager.RespawnShadow();
             }
         }
     }

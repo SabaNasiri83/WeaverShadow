@@ -11,30 +11,57 @@ public class CheckpointManager : MonoBehaviour
     [Tooltip("نقطه‌ای که بازیکن بعد از شکست بهش برمی‌گرده - یک GameObject خالی بساز و اینجا بگذار")]
     public Transform currentCheckpoint;
 
-    // فاصله‌ی نسبی سایه از آریا رو حفظ می‌کنیم تا بعد از ریست هم رعایت شه
-    private Vector3 shadowOffsetFromAria;
+    [Tooltip("فاصله‌ی سایه نسبت به آریا موقع ریست شدن - یه عدد کوچیک و امن بذار (نه فاصله‌ی اولیه‌ی صحنه که ممکنه سایه رو بیرون از زمین بندازه)")]
+    public Vector3 shadowRespawnOffset = new Vector3(0.5f, 0f, 0f);
 
-    void Start()
+    public void RespawnAria()
     {
-        if (aria != null && shadow != null)
-        {
-            shadowOffsetFromAria = shadow.transform.position - aria.transform.position;
-        }
-    }
-
-    public void RespawnAtCheckpoint()
-    {
-        if (currentCheckpoint == null) return;
+        if (currentCheckpoint == null || aria == null) return;
 
         Rigidbody2D ariaRb = aria.GetComponent<Rigidbody2D>();
+        Vector3 ariaTargetPos = currentCheckpoint.position;
+
+        if (ariaRb != null)
+        {
+            ariaRb.velocity = Vector2.zero;
+            ariaRb.angularVelocity = 0f;
+            ariaRb.position = ariaTargetPos;
+        }
+        else
+        {
+            aria.transform.position = ariaTargetPos;
+        }
+
+        Physics2D.SyncTransforms();
+    }
+
+    public void RespawnShadow()
+    {
+        if (currentCheckpoint == null || shadow == null) return;
+
         Rigidbody2D shadowRb = shadow.GetComponent<Rigidbody2D>();
+        Vector3 shadowTargetPos = currentCheckpoint.position + shadowRespawnOffset;
 
-        // متوقف کردن سرعت فعلی قبل از جابه‌جایی (وگرنه ممکنه بعد از تله‌پورت پرتاب شن)
-        if (ariaRb != null) ariaRb.velocity = Vector2.zero;
-        if (shadowRb != null) shadowRb.velocity = Vector2.zero;
+        if (shadowRb != null)
+        {
+            shadowRb.velocity = Vector2.zero;
+            shadowRb.angularVelocity = 0f;
+            shadowRb.position = shadowTargetPos;
+        }
+        else
+        {
+            shadow.transform.position = shadowTargetPos;
+        }
 
-        aria.transform.position = currentCheckpoint.position;
-        shadow.transform.position = currentCheckpoint.position + shadowOffsetFromAria;
+        Physics2D.SyncTransforms();
+    }
+
+    // نگه داشته شده برای سازگاری با قبل - هر دو کاراکتر رو با هم ریست می‌کنه
+    // دیگه جایی توی پروژه صداش نمی‌زنیم؛ به‌جاش از RespawnAria() یا RespawnShadow() جدا استفاده کن
+    public void RespawnAtCheckpoint()
+    {
+        RespawnAria();
+        RespawnShadow();
     }
 
     // این متد رو بعدا از یک Trigger چک‌پوینت جدید صدا می‌زنیم تا موقعیت رو آپدیت کنه

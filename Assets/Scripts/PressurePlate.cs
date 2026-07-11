@@ -16,6 +16,12 @@ public class PressurePlate : MonoBehaviour
     public Color pressedColor = Color.green;
     public Color unpressedColor = Color.red;
 
+    [Header("Sprites (اختیاری - اگه پر بشه به‌جای رنگ استفاده می‌شه)")]
+    [Tooltip("عکس اهرم وقتی فشرده نشده (مثلا switchBlue)")]
+    public Sprite unpressedSprite;
+    [Tooltip("عکس اهرم وقتی فشرده شده (مثلا switchBlue_pressed)")]
+    public Sprite pressedSprite;
+
     [Header("Glow Halo")]
     [Tooltip("رنگ هاله‌ی نور وقتی کلید فشرده میشه")]
     public Color glowColor = new Color(1f, 0.95f, 0.4f, 0.8f);
@@ -56,8 +62,16 @@ public class PressurePlate : MonoBehaviour
 
     void UpdateVisual()
     {
-        if (spriteRenderer != null)
+        if (spriteRenderer == null) return;
+
+        // اگه هر دو عکس (فشرده/نفشرده) ست شده باشن، عکس رو عوض کن
+        if (unpressedSprite != null && pressedSprite != null)
         {
+            spriteRenderer.sprite = isPressed ? pressedSprite : unpressedSprite;
+        }
+        else
+        {
+            // در غیر این‌صورت مثل قبل فقط رنگ رو عوض کن
             spriteRenderer.color = isPressed ? pressedColor : unpressedColor;
         }
     }

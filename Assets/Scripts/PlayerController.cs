@@ -9,6 +9,15 @@ public class PlayerController : MonoBehaviour
     [Tooltip("وقتی خم شده (Duck) هستیم، حرکت افقی با این ضریب کند می‌شه")]
     public float duckSpeedMultiplier = 0.5f;
 
+    [Header("Double Tap Jump")]
+    [Tooltip("اگه توی این بازه زمانی (ثانیه) بعد از پرش اول، دوباره کلید پرش زده بشه، پرش دوم بلندتر انجام می‌شه")]
+    public float doubleTapWindow = 0.35f;
+    [Tooltip("ضریب ارتفاع پرش دوم نسبت به پرش عادی (مثلا 1.4 یعنی ۴۰٪ بلندتر)")]
+    public float doubleJumpForceMultiplier = 1.4f;
+
+    private float firstJumpPressTime = -10f;
+    private bool usedDoubleJump = false;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.15f;
@@ -72,13 +81,35 @@ public class PlayerController : MonoBehaviour
             isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         }
 
-        if (Input.GetButtonDown("Jump") && isGrounded && !isDucking)
+        // هر بار که پاش به زمین می‌رسه، اجازه‌ی پرش دوم دوباره فعال می‌شه
+        if (isGrounded)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            usedDoubleJump = false;
         }
+
+        HandleJumpInput();
 
         UpdateDuckCollider();
         UpdateAnimator();
+    }
+
+    void HandleJumpInput()
+    {
+        if (!Input.GetButtonDown("Jump") || isDucking) return;
+
+        if (isGrounded)
+        {
+            // پرش اول - ارتفاع عادی
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            firstJumpPressTime = Time.time;
+            usedDoubleJump = false;
+        }
+        else if (!usedDoubleJump && Time.time - firstJumpPressTime <= doubleTapWindow)
+        {
+            // پرش دوم - فقط اگه توی بازه‌ی زمانی کوتاه بعد از پرش اول دوباره زده بشه، بلندتر می‌پره
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce * doubleJumpForceMultiplier);
+            usedDoubleJump = true;
+        }
     }
 
     void FixedUpdate()
