@@ -10,10 +10,19 @@ public class ShadowThrow : MonoBehaviour
     [Tooltip("هرچقدر بیشتر باشه، پرتاب قوی‌تر می‌شه")]
     public float powerMultiplier = 3f;
 
+    [Header("Damage")]
+    [Tooltip("چقدر دمیج به باس بزنه وقتی توی حالت پرتاب‌شده بهش برخورد کنه")]
+    public int damageToBoss = 1;
+
+    [Header("Sound (اختیاری)")]
+    [Tooltip("صدای برخورد سایه به دیوار/زمین (نه باس) - پیشنهاد: impactSoft_medium")]
+    public RandomSFX impactSfx;
+
     private Rigidbody2D rb;
     private PlayerController playerController;
     private LineRenderer aimLine;
     private bool isAiming = false;
+    private bool isLaunched = false; // تا وقتی این true باشه یعنی سایه توی هواست و می‌تونه دمیج بزنه
     private Vector2 aimDirection;
     private float aimPower;
 
@@ -69,7 +78,6 @@ public class ShadowThrow : MonoBehaviour
     {
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 rawDirection = mouseWorldPos - (Vector2)transform.position;
-
         float distance = Mathf.Min(rawDirection.magnitude, maxAimDistance);
         aimDirection = rawDirection.normalized;
         aimPower = distance * powerMultiplier;
@@ -82,6 +90,7 @@ public class ShadowThrow : MonoBehaviour
     void Launch()
     {
         rb.velocity = aimDirection * aimPower;
+        isLaunched = true; // از این لحظه تا برخورد بعدی، می‌تونه دمیج بزنه
         StopAiming();
         StartCoroutine(DisableControlBriefly());
     }
@@ -100,5 +109,24 @@ public class ShadowThrow : MonoBehaviour
     {
         isAiming = false;
         aimLine.enabled = false;
+    }
+
+    // وقتی سایه‌ی پرتاب‌شده به چیزی برخورد کنه این صدا زده می‌شه
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!isLaunched) return;
+
+        BossController boss = collision.gameObject.GetComponent<BossController>();
+        if (boss != null)
+        {
+            boss.TakeDamage(damageToBoss);
+        }
+        else if (impactSfx != null)
+        {
+            impactSfx.Play(); // فقط وقتی به باس نخورده - چون خودِ باس صدای ضربه‌ی خودش رو پخش می‌کنه
+        }
+
+        // چه به باس بخوره چه به هرچیز دیگه‌ای، پرتاب تموم شده حساب می‌شه
+        isLaunched = false;
     }
 }

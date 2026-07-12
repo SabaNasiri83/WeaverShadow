@@ -27,6 +27,10 @@ public class ToxicLever : MonoBehaviour
     [Tooltip("هر فریم چقدر طول بکشه (ثانیه)")]
     public float frameDuration = 0.06f;
 
+    [Header("Sound (اختیاری)")]
+    [Tooltip("صدای کشیدن اهرم - پیشنهاد: impactMetal_light")]
+    public RandomSFX pullSfx;
+
     private SpriteRenderer spriteRenderer;
     private Coroutine animCoroutine;
     private bool isActive = false;
@@ -71,6 +75,8 @@ public class ToxicLever : MonoBehaviour
     // سایه کنار اهرم ایستاده: مواد قطع، هزارد خاموش، پل روشن
     void Activate()
     {
+        if (pullSfx != null) pullSfx.Play();
+
         if (flowsToStop != null)
         {
             foreach (var flow in flowsToStop)
@@ -91,6 +97,8 @@ public class ToxicLever : MonoBehaviour
     // سایه از کنار اهرم دور شد: فوراً همه‌چیز برمی‌گرده به حالت اول
     void Deactivate()
     {
+        if (pullSfx != null) pullSfx.Play();
+
         if (flowsToStop != null)
         {
             foreach (var flow in flowsToStop)

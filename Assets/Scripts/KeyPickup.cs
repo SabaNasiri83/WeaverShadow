@@ -11,6 +11,11 @@ public class KeyPickup : MonoBehaviour
     [Tooltip("افکت یا صدای کوچیک هنگام برداشتن کلید (اختیاری - می‌تونی خالی بذاری)")]
     public GameObject pickupEffectPrefab;
 
+    [Header("Sound (اختیاری)")]
+    [Tooltip("چندتا نسخه‌ی مختلف صدای برداشتن کلید - پیشنهاد: impactGlass_light")]
+    public AudioClip[] pickupClips;
+    [Range(0f, 1f)] public float pickupVolume = 0.8f;
+
     private KeyManager keyManager;
     private bool collected = false;
 
@@ -44,6 +49,18 @@ public class KeyPickup : MonoBehaviour
             Instantiate(pickupEffectPrefab, transform.position, Quaternion.identity);
         }
 
+        PlayPickupSound();
+
         Destroy(gameObject);
+    }
+
+    void PlayPickupSound()
+    {
+        if (pickupClips == null || pickupClips.Length == 0) return;
+
+        // از PlayClipAtPoint استفاده می‌کنیم چون خودِ آبجکت کلید همین الان Destroy می‌شه
+        // و اگه صدا روی AudioSource خودش پخش بشه، با نابود شدن آبجکت قطع می‌شد
+        AudioClip clip = pickupClips[Random.Range(0, pickupClips.Length)];
+        AudioSource.PlayClipAtPoint(clip, transform.position, pickupVolume);
     }
 }

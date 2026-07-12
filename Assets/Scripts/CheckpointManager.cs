@@ -14,6 +14,10 @@ public class CheckpointManager : MonoBehaviour
     [Tooltip("فاصله‌ی سایه نسبت به آریا موقع ریست شدن - یه عدد کوچیک و امن بذار (نه فاصله‌ی اولیه‌ی صحنه که ممکنه سایه رو بیرون از زمین بندازه)")]
     public Vector3 shadowRespawnOffset = new Vector3(0.5f, 0f, 0f);
 
+    [Header("Sound (اختیاری)")]
+    [Tooltip("صدایی که هر بار کاراکتر به چک‌پوینت برمی‌گرده پخش می‌شه - پیشنهاد: impactSoft_heavy یا impactWood_heavy")]
+    public RandomSFX respawnSfx;
+
     public void RespawnAria()
     {
         if (currentCheckpoint == null || aria == null) return;
@@ -33,6 +37,7 @@ public class CheckpointManager : MonoBehaviour
         }
 
         Physics2D.SyncTransforms();
+        PlayRespawnSound();
     }
 
     public void RespawnShadow()
@@ -54,6 +59,7 @@ public class CheckpointManager : MonoBehaviour
         }
 
         Physics2D.SyncTransforms();
+        PlayRespawnSound();
     }
 
     // نگه داشته شده برای سازگاری با قبل - هر دو کاراکتر رو با هم ریست می‌کنه
@@ -68,5 +74,10 @@ public class CheckpointManager : MonoBehaviour
     public void SetCheckpoint(Transform newCheckpoint)
     {
         currentCheckpoint = newCheckpoint;
+    }
+
+    void PlayRespawnSound()
+    {
+        if (respawnSfx != null) respawnSfx.Play();
     }
 }

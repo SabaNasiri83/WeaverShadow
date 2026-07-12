@@ -76,6 +76,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   pickupEffectPrefab: {fileID: 0}
+  pickupClips:
+  - {fileID: 8300000, guid: 79c714f1e8567864ea3891f0978637a3, type: 3}
+  pickupVolume: 0.8
 --- !u!212 &4648381074135748575
 SpriteRenderer:
   m_ObjectHideFlags: 0
